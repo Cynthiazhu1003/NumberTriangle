@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -63,7 +65,17 @@ public class NumberTriangle {
      * Note: a NumberTriangle contains at least one value.
      */
     public void maxSumPath() {
-        // for fun [not for credit]:
+        if(!isLeaf()) {
+            if (left != null) left.maxSumPath();
+            if (right != null) right.maxSumPath();
+
+            int leftMax = (left != null) ? left.getRoot() : 0;
+            int rightMax = (right != null) ? right.getRoot() : 0;
+            root += Math.max(leftMax, rightMax);
+
+            left = null;
+            right =  null;
+        }
     }
 
 
@@ -115,6 +127,7 @@ public class NumberTriangle {
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
         NumberTriangle top = null;
+        List<List<NumberTriangle>> rows = new ArrayList<>();
 
         String line = br.readLine();
         while (line != null) {
@@ -122,12 +135,30 @@ public class NumberTriangle {
             // remove when done; this line is included so running starter code prints the contents of the file
             System.out.println(line);
 
-            // TODO process the line
-
-            //read the next line
+            String[] numbers = line.trim().split("\\s+");
+            List<NumberTriangle> currentrow = new ArrayList<>();
+            for (String numStr : numbers) {
+                int value = Integer.parseInt(numStr);
+                currentrow.add(new NumberTriangle(value));
+            }
+            rows.add(currentrow);
             line = br.readLine();
         }
         br.close();
+
+        for (int i = 0; i < rows.size() - 1; i++) {
+            List<NumberTriangle> currentrow = rows.get(i);
+            List<NumberTriangle> nextrow = rows.get(i + 1);
+
+            for (int j = 0; j < currentrow.size(); j++){
+                NumberTriangle currentnode = currentrow.get(j);
+                currentnode.setLeft(nextrow.get(j));
+                currentnode.setRight(nextrow.get(j+1));
+            }
+        }
+        if (!rows.isEmpty()) {
+            top = rows.get(0).get(0);
+        }
         return top;
     }
 
